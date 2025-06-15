@@ -1,0 +1,159 @@
+What does this part of the project consist?
+The  answer is:
+	Flow of the code
+agent logic, 
+APIs, used in the program
+Setup 
+
+
+1.Flow of the code:
+
+User Goal Input
+      ↓
+  PlannerAgent
+  (Creates agent execution plan based on keywords in goal)
+      ↓
+Execution Loop:
+    ↓
+  LaunchAgent
+  (Fetch SpaceX launch & location)
+    ↓
+  WeatherAgent
+  (Fetch weather info for launch location)
+    ↓
+  NewsAgent
+  (Fetch news headlines about the launch)
+    ↓
+  AnalyzerAgent
+  (Check if weather/news indicate possible delay)
+    ↓
+  SummaryAgent
+  (Generate formatted summary for output)
+    ↓
+  EvaluatorAgent
+  (Checks if goal is fulfilled → summary generated)
+
+
+2. Agent logic:
+
+        a.  PlannerAgent
+        •	Input: Natural language goal string from the user.
+        •	Logic:
+        	Scans the goal for keywords like "launch", "weather", "delay", "summary".
+        	Based on these keywords, creates an execution plan (ordered list of agent names).
+        •	Output: A list of agent names (plan), e.g.:
+        ["LaunchAgent", "WeatherAgent", "NewsAgent", "AnalyzerAgent", "SummaryAgent"]
+
+        b. LaunchAgent
+        •	Input: Shared data dictionary from Coordinator.
+        •	Logic:
+        	Calls SpaceX API to fetch the next upcoming launch.
+           
+           
+           Extracts:
+        	launch_name (e.g., "Starlink 32")
+        	launchpad_id (ID of launchpad)
+        	Uses the launchpad ID to fetch the launchpad location (e.g., "Cape Canaveral").
+        
+        •	Output: Updates data dictionary with:
+
+        {
+            "launch_name": "Starlink 32",
+            "location": "Cape Canaveral"
+        }
+
+
+
+        c. WeatherAgent
+        •	Input: location from data dictionary.
+        •	Logic:
+        	Uses OpenWeatherMap API to fetch weather info for the location.
+        	Extracts:
+        	Main weather condition (e.g., "Rain", "Clear")
+        	Wind speed
+        
+        •	Error Handling:
+        	If API call fails, sets weather to "Unknown".
+        •	Output: Updates data dictionary:
+        {
+            "weather_main": "Rain",
+            "wind_speed": 6.2
+        }
+
+
+
+        d. NewsAgent
+
+        •	Input: launch_name from data dictionary.
+        •	Logic:
+        	Uses NewsAPI to fetch the latest 3 news articles related to the launch.
+        	Extracts article titles.
+        
+        •	Output: Updates data dictionary:
+        {
+            "news_headlines": ["SpaceX delays launch", "New window announced", ...]
+        }
+
+
+
+
+        e. AnalyzerAgent
+        •	Input: weather_main and news_headlines from data.
+        •	Logic:
+        	Checks if weather_main is bad ("Rain", "Snow", "Thunderstorm").
+        	Checks if any news headline contains the word "delay".
+        	If either condition is true, marks delay as likely.
+        •	Output: Updates data dictionary:
+        {
+            "delay_likely": True
+        }
+
+        f.  SummaryAgent
+        •	Input: All previous data: launch_name, location, weather, news, delay.
+        •	Logic:
+        	Formats the information into a human-readable summary.
+        
+        •	Output: Adds a summary string to data:
+        {
+            "summary": "Launch: Starlink 32\nLocation: Cape Canaveral\nWeather: Rain (Wind: 6.2 m/s)..."
+        }
+
+        g.  EvaluatorAgent
+        •	Input: Final data dictionary.
+        •	Logic:
+        	Simply checks if the "summary" field exists in the data.
+        
+        •	Output: Returns:
+        	True → if goal is fulfilled (summary exists)
+        	False → if not yet completed
+
+
+Example Summary Output:
+Launch: Starlink 32
+Location: Cape Canaveral
+Weather: Rain (Wind: 6.2 m/s)
+News:
+- SpaceX delays launch
+- New window announced
+- Weather concerns mount
+Delay Likely: Yes
+
+
+APIs Used in the development of the program:
+News API for extracting news about the launch
+Spacex API to get next launch and location; no key needed to utilize this api
+Weather API for analyzing weather of the launch location 
+
+
+Overall Setup: Purpose of the Program
+Built a multi-agent system in Python that collaborates to fulfill user goals like:
+“Find the next SpaceX launch, check weather at that location, then summarize if it may be delayed.”
+
+
+The System:
+•	Receives natural language goals
+•	Automatically plans the necessary steps
+•	Uses external APIs (SpaceX, OpenWeatherMap, NewsAPI)
+•	Agents pass enriched data between each other
+•	Produces a final human-readable summary
+
