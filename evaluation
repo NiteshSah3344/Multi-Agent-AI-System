@@ -9,7 +9,7 @@ Agent Trajectory:
 1. PlannerAgent ➝ LaunchAgent ➝ WeatherAgent ➝ NewsAgent ➝ AnalyzerAgent ➝ SummaryAgent ➝ EvaluatorAgent
 
 Intermediate Contributions:
-- *LaunchAgent: Added `launch_name = "Falcon 9 Starlink"` and `location = "California"`
+- LaunchAgent: Added `launch_name = "Falcon 9 Starlink"` and `location = "California"`
 - WeatherAgent: Added `weather_main = "Rain"`, `wind_speed = 5.1`
 - NewsAgent: Extracted top 3 headlines related to launch
 - AnalyzerAgent: Flagged `delay_likely = True` due to weather
